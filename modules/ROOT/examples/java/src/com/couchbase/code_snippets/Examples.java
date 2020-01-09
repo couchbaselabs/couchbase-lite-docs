@@ -23,7 +23,11 @@ private static final String DB_NAME = "gettingstarted";
 /*      Credentials declared this way purely for expediency in this demo - use OAUTH in production code */
 private static final String DB_USER = "sync_gateway";
 private static final String DB_PASS = "password"; // <3>
+<<<<<<< HEAD
 private static final String DB_PATH=new File("").getAbsolutePath()+"/resources";
+=======
+private static final String DB_PATH = new File("").getAbsolutePath()+"/resources";
+>>>>>>> f59062bf8a28b45966fc8f2d413607a220ce097a
 
 
 public static void main (String [] args) throws CouchbaseLiteException, InterruptedException, URISyntaxException {
@@ -43,7 +47,11 @@ public static void main (String [] args) throws CouchbaseLiteException, Interrup
     String Prop_Type = "type";
     String Prop_Version = "version";
     String searchStringType = "SDK";
+<<<<<<< HEAD
     String dirPath=new File("").getAbsolutePath()+"/resources";
+=======
+    String dirPath = new File("").getAbsolutePath()+"/resources";
+>>>>>>> f59062bf8a28b45966fc8f2d413607a220ce097a
 
 
     // Initialize Couchbase Lite
