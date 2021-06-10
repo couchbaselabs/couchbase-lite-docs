@@ -2394,3 +2394,109 @@ class ExamplesP2p(private val context: Context) {
   // end::sgw-repl-pull-callouts[]
   */
 }
+
+
+
+
+
+    fun testQuerySyntaxAll() {
+
+        // tag::query-syntax-all[]
+//        try {
+//            this_Db = new Database("hotels");
+//        } catch (CouchbaseLiteException e) {
+//            e.printStackTrace();
+//        }
+        val db = openOrCreateDatabaseForUser(currentUser)
+        val listQuery: Query = QueryBuilder.select(SelectResult.all())
+                .from(DataSource.database(db!!))
+        // end::query-syntax-all[]
+
+        // tag::query-access-all[]
+        val hotels: HashMap<String, Hotel> = HashMap<String, Hotel>()
+        try {
+            for (result in listQuery.execute().allResults()) {
+                // get the k-v pairs from the 'hotel' key's value into a dictionary
+                val thisDocsProps = result.getDictionary(0) // <.>
+                val thisDocsId = thisDocsProps!!.getString("id")
+                val thisDocsName = thisDocsProps.getString("name")
+                val thisDocsType = thisDocsProps.getString("type")
+                val thisDocsCity = thisDocsProps.getString("city")
+
+                // Alternatively, access results value dictionary directly
+                val hotel = Hotel()
+                hotel.id = result.getDictionary(0)!!.getString("id").toString() // <.>
+                hotel.type = result.getDictionary(0)!!.getString("type").toString()
+                hotel.name = result.getDictionary(0)!!.getString("name").toString()
+                hotel.city = result.getDictionary(0)!!.getString("city").toString()
+                hotel.country = result.getDictionary(0)!!.getString("country").toString()
+                hotel.description = result.getDictionary(0)!!.getString("description").toString()
+                hotels[hotel.id] = hotel
+            }
+        } catch (e: CouchbaseLiteException) {
+            e.printStackTrace()
+        }
+
+        // end::query-access-all[]
+    }
+
+    @Throws(CouchbaseLiteException::class, JSONException::class)
+    fun testQuerySyntaxJson() {
+        val db = openOrCreateDatabaseForUser(currentUser)
+        // tag::query-syntax-all[]
+        // Example assumes Hotel class object defined elsewhere
+//        Database db = null;
+//        try {
+//                db = new Database(dbName);
+//        } catch (CouchbaseLiteException e) {
+//            e.printStackTrace();
+//        }
+
+        // Build the query
+        val listQuery: Query = QueryBuilder.select(SelectResult.all())
+                .from(DataSource.database(db!!))
+
+        // end::query-syntax-all[]
+
+        // tag::query-access-json[]
+        // Uses simple JSON -- e.g. import org.json.JSONObject
+        // Relies on Hotel class object defined out-of-scope
+
+        val hotels = ArrayList<Hotel>()
+        // Run query
+        for (result in listQuery.execute()) {
+
+          // Get result as JSON string
+          val thisJsonString = result.getDictionary(0)!!.toJSON() // <.>
+          Log.d("Convert", "JSON string: $thisJsonString")
+
+          // Get JSON object from JSON string
+          val thisJSONobject = JSONObject(thisJsonString) // <.>
+          Log.d("Convert", "JSON object: " + thisJSONobject["name"])
+
+          // Get native object from JSON object
+          val jsonObject = JSONObject(thisJsonString.trim { it <= ' ' })
+          val keys = jsonObject.keys()
+          val jsonDict = HashMap<String, Any>()
+          while (keys.hasNext()) { // <.>
+              val key = keys.next()
+              jsonDict[key] = jsonObject[key]
+              Log.d("Convert", "Native object: " + jsonDict[key])
+          }
+
+          // Get custom object from Native 'dictionary' object
+          val thisHotel = Hotel()
+          thisHotel.id = jsonDict["id"].toString() // <.>
+          thisHotel.type = jsonDict["type"].toString()
+          thisHotel.name = jsonDict["name"].toString()
+          thisHotel.city = jsonDict["city"].toString()
+          thisHotel.country = jsonDict["country"].toString()
+          thisHotel.description = jsonDict["description"].toString()
+          hotels.add(thisHotel)
+          Log.d("Convert", "MutableArray of Hotels: " + hotels[hotels.size - 1].name)
+
+        } // end for query loop
+        // end::query-access-json[]
+
+    }
+    /* end func testQuerySyntaxJson */

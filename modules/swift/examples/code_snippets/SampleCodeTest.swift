@@ -2124,7 +2124,7 @@ class QueryResultSets {
 
 // end::query-syntax-all[]
 
-// tag::query-access-all[]
+    // tag::query-access-all[]
 
         do {
 
@@ -2160,22 +2160,24 @@ class QueryResultSets {
             for (_, row) in
                 try! listQuery.execute().allResults().enumerated() {
 
-                let jsonString = row.dictionary(forKey: "_doc")!.toJSON()
+                let jsonString = row.dictionary(forKey: "_doc")!.toJSON() // <.>
 
                 let thisJsonObj =
                         try! JSONSerialization.jsonObject(
                                 with: jsonString.data(using: .utf8)! , options:[])
-                                    as? [String: Any]
+                                    as? [String: Any] // <.>
 
-                let docid = thisJsonObj!["id"] as! String
+                // Use Json Object to populate Native object <.>
+                this_hotel.id = thisJsonObj!["id"] as! String
 
-                let name = thisJsonObj!["name"] as! String
+                this_hotel.name = thisJsonObj!["name"] as! String
 
-                let type = thisJsonObj!["type"] as! String
+                this_hotel.type = thisJsonObj!["type"] as! String
 
-                let city = thisJsonObj!["city"] as! String
+                this_hotel.city = thisJsonObj!["city"] as! String
 
-                print("the JSON Object's propertiess are: ", docid,name,type,city)
+                hotels[this_hotel.id] = this_hotel
+
 
             } // end for
 
@@ -2183,6 +2185,13 @@ class QueryResultSets {
             print(err.localizedDescription)
 
         } // end do
+
+
+    } // end func dontTestQueryAll
+
+    // end::query-access-json[]
+
+
 
 
     } // end func dontTestQueryAll

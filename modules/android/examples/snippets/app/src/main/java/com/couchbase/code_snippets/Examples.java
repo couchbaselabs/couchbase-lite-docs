@@ -2637,7 +2637,51 @@ public class TestQueries {
         }
 
         // end::query-access-all[]
-    }
+      }
+
+    // tag::query-access-json[]
+    // Uses simple JSON -- e.g. import org.json.JSONObject
+    // Relies on Hotel class object defined out-of-scope
+    ArrayList<Hotel> hotels = new ArrayList<Hotel>();
+
+    // Run query
+    for (Result result : listQuery.execute()) {
+
+      // Get result as JSON string
+      String thisJsonString =
+                result.getDictionary(0).toJSON(); // <.>
+      Log.d("Convert", "JSON string: " + thisJsonString );
+
+      // Get JSON object from JSON string
+      JSONObject thisJSONobject = new JSONObject(thisJsonString); // <.>
+      Log.d("Convert", "JSON object: " + thisJSONobject.get("name"));
+
+      // Get native object from JSON object // <.>
+      JSONObject jsonObject = new JSONObject(thisJsonString.trim());
+      Iterator<String> keys = jsonObject.keys();
+      HashMap<String,Object> jsonDict  = new HashMap<String,Object>();
+
+      while(keys.hasNext()) {
+          String key = keys.next();
+          jsonDict.put(key,jsonObject.get(key));
+          Log.d("Convert", "Native object: " + jsonDict.get(key));
+      }
+
+      // Get custom object from Native 'dictionary' object
+      Hotel thisHotel = new Hotel();
+      thisHotel.id = jsonDict.get("id").toString();
+      thisHotel.type = jsonDict.get("type").toString();
+      thisHotel.name = jsonDict.get("name").toString();
+      thisHotel.city = jsonDict.get("city").toString();
+      thisHotel.country = jsonDict.get("country").toString();
+      thisHotel.description = jsonDict.get("description").toString();
+      hotels.add(thisHotel);
+      Log.d("Convert", "MutableArray of Hotels: " + hotels.get(hotels.size()-1).name);
+
+  }
+
+  // end::query-access-json[]
+
 
     public void testQuerySyntaxProps() throws CouchbaseLiteException {
 
